@@ -1,19 +1,25 @@
 {
-  "name": "csvtest",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.2",
-    "vite": "^4.4.5"
-  },
+  "name": "scrpttest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "vite.config.js",
   "dependencies": {
-    "@types/papaparse": "^5.3.10",
-    "papaparse": "^5.4.1"
-  }
+    "esbuild": "^0.18.20",
+    "fsevents": "^2.3.3",
+    "nanoid": "^3.3.7",
+    "papaparse": "^5.4.1",
+    "picocolors": "^1.0.0",
+    "postcss": "^8.4.31",
+    "rollup": "^3.29.4",
+    "source-map-js": "^1.0.2",
+    "typescript": "^5.2.2",
+    "undici-types": "^5.26.5",
+    "vite": "^4.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
 }
