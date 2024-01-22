@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <style>
+      .imageslider {
+        width: 752px;
+        margin: 0 auto;
+        overflow: hidden;
+      }
+
+      #imageslider-image-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        height: 500px;
+        align-items: center;
+      }
+
+      #imageslider-main-image {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        object-position: center;
+      }
+
+      .imageslider-button-container {
+        width: 100%;
+        margin: 0 auto;
+        justify-content: space-between;
+        display: flex;
+      }
+      .imageslider-button {
+        background-color: #0000ff;
+        color: white;
+        padding: 10px 20px;
+        cursor: pointer;
+        width: 180px;
+        border-radius: 5px;
+        border: none;
+        font-size: 18px;
+        font-weight: bolder;
+      }
+    </style>
+    <div class="imageslider">
+      <div id="imageslider-image-container">
+        <img id="imageslider-main-image" src="images/image-4.jpg" alt="Default Image" />
+      </div>
+      <div class="imageslider-button-container">
+        <button class="imageslider-button" onclick="changeImage('images/image-1.jpg')">
+          Button 1
+        </button>
+        <button class="imageslider-button" onclick="changeImage('images/image-2.jpg')">
+          Button 2
+        </button>
+        <button class="imageslider-button" onclick="changeImage('images/image-3.jpg')">
+          Button 3
+        </button>
+        <button class="imageslider-button" onclick="changeImage('images/image-4.jpg')">
+          2024年
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // 関数で画像を切り替える
+      function changeImage(imageFileName) {
+        document.getElementById("imageslider-main-image").src = imageFileName;
+      }
+    </script>
+  </body>
+</html>
