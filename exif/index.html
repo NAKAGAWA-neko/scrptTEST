@@ -20,7 +20,7 @@
       .exif-header {
         width: 100%;
         margin: 0;
-        padding: 2%;
+        padding: 20px;
         font-size: 20px;
         background-color: rgb(2, 111, 136);
         text-align: center;
@@ -29,39 +29,42 @@
       }
       .exif-main {
         width: 100%;
-        margin: 20px;
       }
 
       .exif-input {
-        margin: 0;
+        margin: 20px 20px 30px;
+        font-size: 16px;
       }
       .exif-input p {
         font-weight: bolder;
       }
 
       #exifTable {
-        margin: 20px 0;
+        margin: 20px auto;
+        border-collapse: collapse;
       }
       th {
-        padding: 10px 10px 0;
+        padding: 5px;
       }
       tr {
-        border-bottom: 1px;
-        border-color: gray;
+        width: 100%;
+        border-top: 1px solid rgb(0, 0, 0);
+        border-bottom: 1px solid rgb(0, 0, 0);
       }
       td {
         padding: 10px;
         white-space: nowrap;
+        border-bottom: 1px solid gray;
       }
       .map-text {
         text-align: end;
-        margin: 10px 20px;
+        margin: 10px 10px;
       }
     </style>
     <div class="exif-header">Exif（位置情報など入りJEPG）から位置情報を抽出します</div>
     <div class="exif-main">
       <div class="exif-input">
-        <p>複数枚のJPEGファイルを入れられます</p>
+        <p>複数枚のJPEGを入れられます</p>
         <form id="myform">
           <input type="file" id="file" multiple /><br />
           <div id="exifInfo"></div>
