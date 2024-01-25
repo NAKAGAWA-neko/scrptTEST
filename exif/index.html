@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript" src="jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="jquery.exif.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  </head>
+
+  <body>
+    <style>
+      body {
+        margin: 0;
+        width: 100%;
+        font-size: 12px;
+      }
+
+      .exif-header {
+        width: 100%;
+        margin: 0;
+        padding: 2%;
+        font-size: 20px;
+        background-color: rgb(2, 111, 136);
+        text-align: center;
+        color: white;
+        font-weight: bolder;
+      }
+      .exif-main {
+        width: 100%;
+        margin: 20px;
+      }
+
+      .exif-input {
+        margin: 0;
+      }
+      .exif-input p {
+        font-weight: bolder;
+      }
+
+      #exifTable {
+        margin: 20px 0;
+      }
+      th {
+        padding: 10px 10px 0;
+      }
+      tr {
+        border-bottom: 1px;
+        border-color: gray;
+      }
+      td {
+        padding: 10px;
+        white-space: nowrap;
+      }
+      .map-text {
+        text-align: end;
+        margin: 10px 20px;
+      }
+    </style>
+    <div class="exif-header">Exif（位置情報など入りJEPG）から位置情報を抽出します</div>
+    <div class="exif-main">
+      <div class="exif-input">
+        <p>複数枚のJPEGファイルを入れられます</p>
+        <form id="myform">
+          <input type="file" id="file" multiple /><br />
+          <div id="exifInfo"></div>
+        </form>
+      </div>
+      <div id="exifInfo">
+        <table id="exifTable">
+          <thead>
+            <tr>
+              <th>ファイル名</th>
+              <th>緯度（10進法）</th>
+              <th>経度（10進法）</th>
+              <th>緯度（60進法）</th>
+              <th>経度（60進法）</th>
+              <th>撮影時間</th>
+              <th>変更日時</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- ここに行が追加されます -->
+          </tbody>
+        </table>
+      </div>
+      <div class="map-container">
+        <div id="map" style="height: 600px"></div>
+        <div class="map-text">地図は10進法です</div>
+      </div>
+    </div>
+
+    <script>
+      try {
+        // 度、分、秒から十進数形式に変換する関数
+        function convertDMSToDD(degrees, minutes, seconds, direction) {
+          var dd = degrees + minutes / 60 + seconds / (60 * 60);
+
+          if (direction === "S" || direction === "W") {
+            dd = dd * -1; // 南緯(S)と西経(W)は負の値
+          }
+
+          return dd;
+        }
+
+        // Exif情報から緯度と経度を十進数形式で取得する関数
+        function getLatLngFromExif(exifObject) {
+          var latDMS = exifObject.GPSLatitude;
+          var latDir = exifObject.GPSLatitudeRef;
+          var lngDMS = exifObject.GPSLongitude;
+          var lngDir = exifObject.GPSLongitudeRef;
+
+          var lat = convertDMSToDD(latDMS[0], latDMS[1], latDMS[2], latDir);
+          var lng = convertDMSToDD(lngDMS[0], lngDMS[1], lngDMS[2], lngDir);
+
+          return [lat, lng];
+        }
+
+        // Leaflet地図の初期化
+        var map = L.map("map").setView([35.681236, 139.767125], 13);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(map);
+
+        // Exif情報とファイル名を受け取り、テーブルに行を追加し、マーカーを地図に追加する関数
+        var someCallback = function (exifObject, fileName) {
+          console.log(exifObject);
+          var dateTimeOriginal = exifObject.DateTimeOriginal || "不明";
+          var dateTime = exifObject.DateTime || "不明";
+
+          // 緯度と経度の取得
+          var [lat, lng] = getLatLngFromExif(exifObject);
+
+          // 緯度と経度の60進法の形式を取得
+          var latDMS = exifObject.GPSLatitude ? exifObject.GPSLatitude.join(", ") : "不明";
+          var lngDMS = exifObject.GPSLongitude ? exifObject.GPSLongitude.join(", ") : "不明";
+
+          // テーブルに行を追加
+          $("#exifTable tbody").append(
+            "<tr>" +
+              "<td>" +
+              fileName +
+              "</td>" +
+              "<td>" +
+              lat +
+              "</td>" +
+              "<td>" +
+              lng +
+              "</td>" +
+              "<td>" +
+              latDMS +
+              "</td>" +
+              "<td>" +
+              lngDMS +
+              "</td>" +
+              "<td>" +
+              dateTimeOriginal +
+              "</td>" +
+              "<td>" +
+              dateTime +
+              "</td>" +
+              "</tr>"
+          );
+
+          // 地図にマーカーを追加
+          if (lat && lng) {
+            addMarker(lat, lng, fileName);
+          }
+        };
+
+        // 地図にマーカーを追加する関数
+        function addMarker(lat, lng, info) {
+          var marker = L.marker([lat, lng]).addTo(map);
+          marker.bindPopup(info);
+        }
+
+        // ファイル入力フィールドのイベントリスナー
+        $("#file").change(function () {
+          var files = this.files;
+          if (files && files.length) {
+            $("#exifTable tbody").empty();
+            for (var i = 0; i < files.length; i++) {
+              (function (file) {
+                var fileName = file.name;
+                $.fileExif(file, function (exifObject) {
+                  someCallback(exifObject, fileName);
+                });
+              })(files[i]);
+            }
+          }
+        });
+      } catch (e) {
+        // エラーが発生した場合、アラートで通知します。
+        alert(e);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript" src="jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="jquery.exif.js"></script>
+  </head>
+
+  <body>
+    <style>
+      body {
+        margin: 0;
+      }
+
+      .exif-header {
+        margin: 0;
+        padding: 2%;
+        font-size: 20px;
+        background-color: rgb(2, 111, 136);
+        text-align: center;
+        color: white;
+        font-weight: bolder;
+      }
+      .exif-main {
+        width: 100%;
+        margin: 20px;
+      }
+
+      .exif-input {
+        margin: 0;
+      }
+      .exif-input p {
+        font-weight: bolder;
+      }
+
+      #exifTable {
+        margin-top: 20px;
+      }
+      th {
+        padding: 10px 10px 0;
+      }
+      tr {
+        border-bottom: 1px;
+        border-color: gray;
+      }
+      td {
+        padding: 10px;
+      }
+    </style>
+    <div class="exif-header">Exif（位置情報など入りJEPG）から位置情報を抽出します</div>
+    <div class="exif-main">
+      <div class="exif-input">
+        <p>複数枚のJPEGファイルを入れられます</p>
+        <form id="myform">
+          <input type="file" id="file" multiple /><br />
+          <div id="exifInfo"></div>
+        </form>
+      </div>
+      <div id="exifInfo">
+        <table id="exifTable">
+          <thead>
+            <tr>
+              <th>ファイル名</th>
+              <th>緯度</th>
+              <th>経度</th>
+              <th>撮影時間</th>
+              <th>変更日時</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- ここに行が追加されます -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      // Exif情報とファイル名を受け取り、テーブルに行を追加する関数
+      var someCallback = function (exifObject, fileName) {
+        // Exif情報をコンソールに表示します（デバッグ用）。
+        console.log(exifObject);
+
+        // 撮影時間の取得（DateTimeOriginal）
+        var dateTimeOriginal = exifObject.DateTimeOriginal || "不明";
+        var dateTime = exifObject.DateTime || "不明"; // ここでdateTimeを定義
+
+        // テーブルのtbodyに新しい行を追加
+        $("#exifTable tbody").append(
+          "<tr>" +
+            "<td>" +
+            fileName +
+            "</td>" +
+            "<td>" +
+            exifObject.GPSLatitude +
+            "</td>" +
+            "<td>" +
+            exifObject.GPSLongitude +
+            "</td>" +
+            "<td>" +
+            dateTimeOriginal +
+            "</td>" + // DateTimeOriginalを表示
+            "<td>" +
+            dateTime +
+            "</td>" + // DateTimeを表示
+            "</tr>"
+        );
+      };
+
+      try {
+        // ファイル入力フィールドのイベントリスナー
+        $("#file").change(function () {
+          var files = this.files;
+          if (files && files.length) {
+            // テーブルの既存の行をクリア
+            $("#exifTable tbody").empty();
+            for (var i = 0; i < files.length; i++) {
+              (function (file) {
+                var fileName = file.name;
+                $.fileExif(file, function (exifObject) {
+                  someCallback(exifObject, fileName);
+                });
+              })(files[i]);
+            }
+          }
+        });
+      } catch (e) {
+        // エラーが発生した場合、アラートで通知します。
+        alert(e);
+      }
+    </script>
+  </body>
+</html>

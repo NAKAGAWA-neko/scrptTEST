@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript" src="jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="jquery.exif.js"></script>
+  </head>
+
+  <body>
+    <form id="myform">
+      <input type="file" id="file" multiple /><br />
+      <div id="exifInfo"></div>
+    </form>
+
+    <script>
+      // この関数は、Exif情報とファイル名を受け取り、それをウェブページに表示します。
+      var someCallback = function (exifObject, fileName) {
+        // Exif情報から緯度と経度を取得し、それをdivタグに追加して表示します。
+        // fileNameは、処理中のファイルの名前です。
+        $("#exifInfo").append(
+          "<p>" +
+            fileName +
+            ": 緯度=" +
+            exifObject.GPSLatitude +
+            ", 経度=" +
+            exifObject.GPSLongitude +
+            "</p>"
+        );
+
+        // Exif情報をコンソールに表示します（デバッグ用）。
+        console.log(exifObject);
+      };
+
+      try {
+        // ファイル入力フィールドに変更があった場合のイベントリスナーを設定します。
+        $("#file").change(function () {
+          var files = this.files;
+          if (files && files.length) {
+            $("#exifInfo").empty();
+            for (var i = 0; i < files.length; i++) {
+              // 即時実行関数を使用して一意のスコープを作成
+              (function (file) {
+                var fileName = file.name;
+                $.fileExif(file, function (exifObject) {
+                  someCallback(exifObject, fileName);
+                });
+              })(files[i]);
+            }
+          }
+        });
+      } catch (e) {
+        // エラーが発生した場合、アラートで通知します。
+        alert(e);
+      }
+    </script>
+  </body>
+</html>
